@@ -84,6 +84,14 @@ class RecipientController {
       zip,
     });
   }
+
+  async index(req, res) {
+    const recipient = await Recipient.findAll({
+      order: ['id'],
+    });
+
+    return res.json(recipient);
+  }
 }
 
 export default new RecipientController();
