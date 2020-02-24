@@ -106,11 +106,10 @@ class DeliveryProblemController {
       return res.status(400).json({ error: 'Problem not found' });
     }
 
+    // set canceled_at at the package status: OK
     const actualPackage = await Package.findByPk(problem.package_id);
 
     await actualPackage.update({ canceled_at: new Date() });
-
-    // set canceled_at at the package status
 
     // send and email to the deliveryman telling that the delivery was canceled
 
