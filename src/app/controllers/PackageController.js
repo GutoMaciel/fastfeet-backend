@@ -61,21 +61,21 @@ class PackageController {
       return res.status(400).json({ error: 'This package was not found' });
     }
 
-    // const { recipient_id, deliveryman_id } = req.body;
+    const { recipient_id, deliveryman_id } = req.body;
 
-    // const checkDeliveryman = await Deliveryman.findByPk(deliveryman_id);
+    const checkDeliveryman = await Deliveryman.findByPk(deliveryman_id);
 
-    // if (!checkDeliveryman) {
-    //   return res.status(400).json({
-    //     error: 'This deliveryman was not found or not available',
-    //   });
-    // }
+    if (!checkDeliveryman) {
+      return res.status(400).json({
+        error: 'This deliveryman was not found or not available',
+      });
+    }
 
-    // const checkRecipient = await Recipient.findByPk(recipient_id);
+    const checkRecipient = await Recipient.findByPk(recipient_id);
 
-    // if (!checkRecipient) {
-    //   return res.status(400).json({ error: 'This recipient was not found' });
-    // }
+    if (!checkRecipient) {
+      return res.status(400).json({ error: 'This recipient was not found' });
+    }
 
     const updatedPackage = await actualPackage.update(req.body);
 
