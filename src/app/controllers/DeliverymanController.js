@@ -25,6 +25,8 @@ class DeliverymanController {
       return res.status(400).json({ error: 'This email was already taken' });
     }
 
+    // avatar input:
+
     const deliveryman = await Deliveryman.create({
       id,
       name,
