@@ -75,8 +75,7 @@ class DeliveryProblemController {
   }
 
   async store(req, res) {
-    // subscribe a new problem of an package
-
+    // subscribe a new problem of an package: OK
     const { id } = req.params;
 
     const problematicPackage = await Package.findByPk(id);

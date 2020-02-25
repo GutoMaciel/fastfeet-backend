@@ -27,7 +27,6 @@ class DeliverymanFunctionalities {
   async update(req, res) {
     // allow deliveryman get a package and update the start_date(when he get the package) and end_date(when he finally delivery the package to the final customer.)
     // the delivery man can only get 5 packages daily. OK
-    // when he deliver the package, he should be able to send a image and fill the signature_id field.
     const schema = Yup.object().shape({
       start_date: Yup.date(),
       end_date: Yup.date(),
@@ -40,26 +39,21 @@ class DeliverymanFunctionalities {
 
     const { id, package_id } = req.params;
 
-    // const { start_date } = req.body;
-
-    // check deliveryman
-
+    // check deliveryman: OK
     const deliveryman = await Deliveryman.findByPk(id);
 
     if (!deliveryman) {
       return res.status(400).json({ error: 'Deliveyrman not found' });
     }
 
-    // check package
-
+    // check package: OK
     const actualPackage = await Package.findByPk(package_id);
 
     if (!actualPackage) {
       return res.status(400).json({ error: 'Package not found' });
     }
 
-    // check package belonging
-
+    // check package belonging: OK
     if (actualPackage.deliveryman_id !== Number(id)) {
       return res.status(400).json({ error: 'Package does not belongs' });
     }
@@ -70,13 +64,15 @@ class DeliverymanFunctionalities {
       },
     });
 
-    // check 5 limit take out daily
-
+    // check 5 limit take out daily: OK
     if (allPackages.lenght >= 5) {
       return res.status(400).json({ error: '5 packages daily limit excedd' });
     }
 
-    // const { start_date } = req.body;
+    // check start date: OK
+    if (actualPackage.canceled_at) {
+      return res.status(400).json({ error: 'Delivery already closed' });
+    }
 
     const updatedPackage = await actualPackage.update(req.body);
 
