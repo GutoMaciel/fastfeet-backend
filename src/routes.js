@@ -10,6 +10,7 @@ import FileController from './app/controllers/FileController';
 import PackageController from './app/controllers/PackageController';
 import DeliverymanFunctionalities from './app/controllers/DeliverymanFunctionalities';
 import DeliveryProblemController from './app/controllers/DeliveryProblemController';
+import DeliveredController from './app/controllers/DeliveredController';
 
 import authMiddlewares from './app/middlewares/auth';
 
@@ -18,6 +19,12 @@ const upload = multer(multerConfig);
 
 routes.post('/users', UserController.store);
 routes.post('/sessions', SessionController.store);
+
+routes.put(
+  '/deliveryman/:id/packages/:package_id/delivered',
+  upload.single('file'),
+  DeliveredController.update
+);
 
 routes.get('/deliveryman/:id/packages', DeliverymanFunctionalities.index);
 routes.put(

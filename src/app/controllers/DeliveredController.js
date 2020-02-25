@@ -1,35 +1,13 @@
 import * as Yup from 'yup';
 // import { startOfDay, endOfDay, parseISO, getHours } from 'date-fns';
-// import File from '../models/File';
+import File from '../models/File';
 import Package from '../models/Package';
 import Deliveryman from '../models/Deliveryman';
-// import Recipient from '../models/Recipient';
 
 class DeliverymanFunctionalities {
-  async index(req, res) {
-    const { id } = req.params;
-
-    const deliveryman = await Deliveryman.findByPk(id);
-
-    if (!deliveryman) {
-      return res.status(400).json({ error: 'Deliveryman was not found' });
-    }
-
-    const delivery = await Package.findAll({
-      where: {
-        deliveryman_id: req.params.id,
-      },
-    });
-
-    return res.json(delivery);
-  }
-
   async update(req, res) {
-    // allow deliveryman get a package and update the start_date(when he get the package) and end_date(when he finally delivery the package to the final customer.)
-    // the delivery man can only get 5 packages daily. OK
     // when he deliver the package, he should be able to send a image and fill the signature_id field.
     const schema = Yup.object().shape({
-      start_date: Yup.date(),
       end_date: Yup.date(),
       signature_id: Yup.number(),
     });
@@ -40,10 +18,7 @@ class DeliverymanFunctionalities {
 
     const { id, package_id } = req.params;
 
-    // const { start_date } = req.body;
-
     // check deliveryman
-
     const deliveryman = await Deliveryman.findByPk(id);
 
     if (!deliveryman) {
@@ -51,7 +26,6 @@ class DeliverymanFunctionalities {
     }
 
     // check package
-
     const actualPackage = await Package.findByPk(package_id);
 
     if (!actualPackage) {
@@ -64,21 +38,24 @@ class DeliverymanFunctionalities {
       return res.status(400).json({ error: 'Package does not belongs' });
     }
 
-    const allPackages = await Package.findAll({
-      where: {
-        deliveryman_id: id,
-      },
-    });
+    // check if the package was started
 
-    // check 5 limit take out daily
+    // check if the package was canceled
 
-    if (allPackages.lenght >= 5) {
-      return res.status(400).json({ error: '5 packages daily limit excedd' });
+    const { end_date } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'You must provide your signature' });
     }
 
-    // const { start_date } = req.body;
+    const { originalname: name, filename: path } = req.file;
 
-    const updatedPackage = await actualPackage.update(req.body);
+    const signatureFile = await File.create({ name, path });
+
+    const updatedPackage = await actualPackage.update({
+      end_date,
+      signature_id: signatureFile.id,
+    });
 
     return res.json(updatedPackage);
   }
