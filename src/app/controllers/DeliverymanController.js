@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
 
@@ -24,8 +25,6 @@ class DeliverymanController {
     if (checkEmailAvailability) {
       return res.status(400).json({ error: 'This email was already taken' });
     }
-
-    // avatar input:
 
     const deliveryman = await Deliveryman.create({
       id,
@@ -73,8 +72,27 @@ class DeliverymanController {
   }
 
   async index(req, res) {
+    const { name } = req.query;
     const { page = 1 } = req.query;
-    const deliveryman = await Deliveryman.findAll({
+
+    if (name) {
+      const deliveryman = await Deliveryman.findAll({
+        where: {
+          name: { [Op.iLike]: `%${name}%` },
+        },
+        order: ['id'],
+        limit: 15,
+        offset: (page - 1) * 10,
+      });
+
+      if (!deliveryman) {
+        return res.status(400).json({ error: 'Deliveryman not found.' });
+      }
+
+      return res.json(deliveryman);
+    }
+
+    const deliverymans = await Deliveryman.findAll({
       limit: 10,
       order: ['id'],
       offset: (page - 1) * 10,
@@ -88,7 +106,7 @@ class DeliverymanController {
       ],
     });
 
-    return res.json(deliveryman);
+    return res.json(deliverymans);
   }
 
   async show(req, res) {

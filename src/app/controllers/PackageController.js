@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Package from '../models/Package';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
@@ -83,6 +84,59 @@ class PackageController {
   }
 
   async index(req, res) {
+    const { product } = req.query;
+    const { page = 1 } = req.query;
+
+    if (product) {
+      const delivery = await Package.findAll({
+        where: {
+          product: { [Op.iLike]: `%${product}%` },
+        },
+        limit: 15,
+        order: ['id'],
+        offset: (page - 1) * 10,
+        include: [
+          {
+            model: Recipient,
+            as: 'recipient',
+            attributes: [
+              'id',
+              'name',
+              'street',
+              'complement',
+              'number',
+              'city',
+              'state',
+              'zip',
+            ],
+          },
+          {
+            model: Deliveryman,
+            as: 'deliveryman',
+            attributes: ['id', 'name', 'email'],
+            include: [
+              {
+                model: File,
+                as: 'avatar',
+                attributes: ['path', 'url'],
+              },
+            ],
+          },
+          {
+            model: File,
+            as: 'signature',
+            attributes: ['id', 'path', 'url'],
+          },
+        ],
+      });
+
+      if (!delivery) {
+        return res.status(400).json({ error: 'Delivery not found.' });
+      }
+
+      return res.json(delivery);
+    }
+
     const allPackages = await Package.findAll({
       attributes: ['id', 'product', 'start_date', 'end_date', 'canceled_at'],
       include: [
