@@ -81,7 +81,7 @@ class DeliverymanController {
           name: { [Op.iLike]: `%${name}%` },
         },
         order: ['id'],
-        limit: 15,
+        limit: 25,
         offset: (page - 1) * 10,
       });
 
@@ -93,7 +93,7 @@ class DeliverymanController {
     }
 
     const deliverymans = await Deliveryman.findAll({
-      limit: 10,
+      limit: 25,
       order: ['id'],
       offset: (page - 1) * 10,
       attributes: ['id', 'name', 'email', 'avatar_id'],

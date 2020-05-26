@@ -185,7 +185,7 @@ class PackageController {
         {
           model: Deliveryman,
           as: 'deliveryman',
-          attributes: ['name', 'email'],
+          attributes: ['id', 'name', 'email'],
           include: [
             {
               model: File,
@@ -198,6 +198,7 @@ class PackageController {
           model: Recipient,
           as: 'recipient',
           attributes: [
+            'id',
             'name',
             'street',
             'number',
